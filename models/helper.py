@@ -22,6 +22,9 @@ def get_backbone(
     elif 'dinov2' in backbone_arch.lower():
         return backbones.DINOv2(model_name=backbone_arch, **backbone_config)
 
+    elif 'dinov3' in backbone_arch.lower():
+        return backbones.DINOv3(model_name=backbone_arch, **backbone_config)
+
 
 def get_aggregator(agg_arch='ConvAP', agg_config={}):
     """Helper function that returns the aggregation layer given its name.
