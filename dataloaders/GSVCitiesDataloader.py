@@ -4,7 +4,7 @@ from torchvision import transforms as T
 
 from dataloaders.GSVCitiesDataset import GSVCitiesDataset
 from . import PittsburgDataset
-from . import MapillaryDataset
+#from . import MapillaryDataset
 
 from prettytable import PrettyTable
 
@@ -109,8 +109,14 @@ class GSVCitiesDataModule(pl.LightningDataModule):
                 if valid_set_name.lower() == 'pitts30k_test':
                     self.val_datasets.append(PittsburgDataset.get_whole_test_set(
                         input_transform=self.valid_transform))
+                elif valid_set_name.lower() == 'pitts_tiny_test':
+                    self.val_datasets.append(PittsburgDataset.get_tiny_test_set(
+                        input_transform=self.valid_transform))
                 elif valid_set_name.lower() == 'pitts30k_val':
                     self.val_datasets.append(PittsburgDataset.get_whole_val_set(
+                        input_transform=self.valid_transform))
+                elif valid_set_name.lower() == 'pitts_tiny_val':
+                    self.val_datasets.append(PittsburgDataset.get_tiny_val_set(
                         input_transform=self.valid_transform))
                 elif valid_set_name.lower() == 'msls_val':
                     self.val_datasets.append(MapillaryDataset.MSLS(

@@ -1,6 +1,8 @@
 from os.path import join, exists
 from collections import namedtuple
 from scipy.io import loadmat
+import copy
+import random
 
 import torchvision.transforms as T
 import torch.utils.data as data
@@ -9,7 +11,7 @@ import torch.utils.data as data
 from PIL import Image, UnidentifiedImageError
 from sklearn.neighbors import NearestNeighbors
 
-root_dir = '../data/Pittsburgh/'
+root_dir = '/media/emmanuel/hdd_storage/pittsburgh/'
 
 if not exists(root_dir):
     raise FileNotFoundError(
@@ -33,6 +35,11 @@ def get_whole_val_set(input_transform):
     return WholeDatasetFromStruct(structFile, input_transform=input_transform)
 
 
+def get_tiny_val_set(input_transform):
+    structFile = join(struct_dir, 'pitts30k_val.mat')
+    return WholeDatasetFromStruct(structFile, input_transform=input_transform, sample=SampleDbStruct())
+
+
 def get_250k_val_set(input_transform):
     structFile = join(struct_dir, 'pitts250k_val.mat')
     return WholeDatasetFromStruct(structFile, input_transform=input_transform)
@@ -41,6 +48,11 @@ def get_250k_val_set(input_transform):
 def get_whole_test_set(input_transform):
     structFile = join(struct_dir, 'pitts30k_test.mat')
     return WholeDatasetFromStruct(structFile, input_transform=input_transform)
+
+
+def get_tiny_test_set(input_transform):
+    structFile = join(struct_dir, 'pitts30k_test.mat')
+    return WholeDatasetFromStruct(structFile, input_transform=input_transform, sample=SampleDbStruct())
 
 
 def get_250k_test_set(input_transform):
@@ -52,6 +64,7 @@ def get_whole_training_set(onlyDB=False):
     return WholeDatasetFromStruct(structFile,
                                   input_transform=input_transform(),
                                   onlyDB=onlyDB)
+
 
 dbStruct = namedtuple('dbStruct', ['whichSet', 'dataset',
                                    'dbImage', 'utmDb', 'qImage', 'utmQ', 'numDb', 'numQ',
@@ -88,12 +101,15 @@ def parse_dbStruct(path):
 
 
 class WholeDatasetFromStruct(data.Dataset):
-    def __init__(self, structFile, input_transform=None, onlyDB=False):
+    def __init__(self, structFile, input_transform=None, onlyDB=False, sample=None):
         super().__init__()
 
         self.input_transform = input_transform
 
         self.dbStruct = parse_dbStruct(structFile)
+        if sample:
+            self.dbStruct = sample(self.dbStruct)
+
         self.images = [join(root_dir, dbIm) for dbIm in self.dbStruct.dbImage]
         if not onlyDB:
             self.images += [join(queries_dir, qIm)
@@ -132,3 +148,38 @@ class WholeDatasetFromStruct(data.Dataset):
                                                                   radius=self.dbStruct.posDistThr)
 
         return self.positives
+
+
+class SampleDbStruct:
+    def __init__(self, db_frac: float=0.5, q_frac: float=0.5):
+        self.db_frac = db_frac
+        self.q_frac = q_frac
+
+    def __call__(self, full: dbStruct) -> dbStruct:
+        num_db = int(self.db_frac * full.numDb)
+        num_q = int(self.q_frac * full.numQ)
+
+        db_indices = sorted(
+            random.sample(
+                range(full.numDb),
+                min(num_db, full.numDb)
+            )
+        )
+        q_indices = sorted(
+            random.sample(
+                range(full.numQ),
+                min(num_q, full.numQ)
+            )
+        )
+        subset_dbImage = [full.dbImage[i] for i in db_indices]
+        subset_utmDb = full.utmDb[db_indices]
+
+        subset_qImage = [full.qImage[i] for i in q_indices]
+        subset_utmQ = full.utmQ[q_indices]
+
+        subset_struct = dbStruct(full.whichSet, full.dataset, 
+                    subset_dbImage, subset_utmDb, subset_qImage,
+                    subset_utmQ, num_db, num_q, full.posDistThr,
+                    full.posDistSqThr, full.nonTrivPosDistSqThr)
+
+        return subset_struct
