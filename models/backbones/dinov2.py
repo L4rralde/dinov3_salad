@@ -35,6 +35,12 @@ class DINOv2(nn.Module):
         self.norm_layer = norm_layer
         self.return_token = return_token
 
+        if self.num_trainable_blocks > 0:
+            self.frozen_blocks = self.model.blocks[:-self.num_trainable_blocks]
+            self.trainable_blocks = self.model.blocks[-self.num_trainable_blocks:]
+        else:
+            self.frozen_blocks = self.model.blocks
+            self.trainable_blocks = []
 
     def forward(self, x):
         """
@@ -54,12 +60,12 @@ class DINOv2(nn.Module):
         
         # First blocks are frozen
         with torch.no_grad():
-            for blk in self.model.blocks[:-self.num_trainable_blocks]:
+            for blk in self.frozen_blocks:
                 x = blk(x)
         x = x.detach()
 
         # Last blocks are trained
-        for blk in self.model.blocks[-self.num_trainable_blocks:]:
+        for blk in self.trainable_blocks:
             x = blk(x)
 
         if self.norm_layer:
