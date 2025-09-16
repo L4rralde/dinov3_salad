@@ -1,11 +1,16 @@
+import torch
 import pytorch_lightning as pl
 
 from vpr_model import VPRModel
 from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
 
+
+torch.set_float32_matmul_precision('medium')
+
+
 if __name__ == '__main__':        
     datamodule = GSVCitiesDataModule(
-        batch_size=60,
+        batch_size=32,
         img_per_place=4,
         min_img_per_place=4,
         shuffle_all=False, # shuffle all images or keep shuffling in-city only
@@ -13,7 +18,7 @@ if __name__ == '__main__':
         image_size=(224, 224),
         num_workers=10,
         show_data_stats=True,
-        val_set_names=['pitts30k_val', 'pitts30k_test', 'msls_val'], # pitts30k_val, pitts30k_test, msls_val
+        val_set_names=['pitts30k_val', 'pitts30k_test']
     )
     
     model = VPRModel(
