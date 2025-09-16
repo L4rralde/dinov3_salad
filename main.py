@@ -1,29 +1,46 @@
+import argparse
+
 import torch
 import pytorch_lightning as pl
 
 from vpr_model import VPRModel
-from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule
+from dataloaders.GSVCitiesDataloader import GSVCitiesDataModule, IMAGENET_MEAN_STD
+from models.backbones.dinov3 import DINOV3_MEAN_STD
 
 
 torch.set_float32_matmul_precision('medium')
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--dinov3', action='store_true')
+args = parser.parse_args()
 
-if __name__ == '__main__':        
+
+if __name__ == '__main__':
+    if not args.dinov3:
+        backbone_arch = 'dinov2_vitb14'
+        img_size = (224, 224)
+        mean_std = IMAGENET_MEAN_STD
+    else:
+        backbone_arch = 'dinov3_vitb16'
+        img_size = (256, 256)
+        mean_std = DINOV3_MEAN_STD
+
     datamodule = GSVCitiesDataModule(
         batch_size=32,
         img_per_place=4,
         min_img_per_place=4,
         shuffle_all=False, # shuffle all images or keep shuffling in-city only
         random_sample_from_each_place=True,
-        image_size=(224, 224),
+        image_size=img_size,
+        mean_std=mean_std,
         num_workers=10,
         show_data_stats=True,
         val_set_names=['pitts30k_val', 'pitts30k_test']
     )
-    
+
     model = VPRModel(
         #---- Encoder
-        backbone_arch='dinov2_vitb14',
+        backbone_arch=backbone_arch,
         backbone_config={
             'num_trainable_blocks': 4,
             'return_token': True,
