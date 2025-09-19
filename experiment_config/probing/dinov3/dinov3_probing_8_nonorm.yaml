@@ -7,8 +7,8 @@ input_config:
 backbone_config:
   num_trainable_blocks: 0
   return_token: true
-  norm_layer: true
+  norm_layer: false
   rope_sincos: true
-  probing_from_layer: 11
+  probing_from_layer: 8
 
-max_epochs: 1
+max_epochs: 3

@@ -7,7 +7,7 @@ input_config:
 backbone_config:
   num_trainable_blocks: 4
   return_token: true
-  norm_layer: true
-  rope_sincos: false
+  norm_layer: false
+  rope_sincos: true
 
 max_epochs: 5

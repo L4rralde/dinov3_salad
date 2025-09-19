@@ -5,9 +5,10 @@ input_config:
   mean_std: "DINOV3_MEAN_STD"
 
 backbone_config:
-  num_trainable_blocks: 4
+  num_trainable_blocks: 0
   return_token: true
-  norm_layer: true
-  rope_sincos: false
+  norm_layer: false
+  rope_sincos: true
+  probing_from_layer: 11
 
-max_epochs: 5
+max_epochs: 3

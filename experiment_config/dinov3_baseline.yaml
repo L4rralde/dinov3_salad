@@ -10,4 +10,4 @@ backbone_config:
   norm_layer: true
   rope_sincos: true
 
-max_epochs: 1
+max_epochs: 10
