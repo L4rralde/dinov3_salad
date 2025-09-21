@@ -11,4 +11,4 @@ backbone_config:
   rope_sincos: true
   probing_from_layer: 0
 
-max_epochs: 3
+max_epochs: 1

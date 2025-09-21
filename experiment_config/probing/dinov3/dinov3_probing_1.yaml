@@ -9,6 +9,6 @@ backbone_config:
   return_token: true
   norm_layer: true
   rope_sincos: true
-  probing_from_layer: 3
+  probing_from_layer: 1
 
-max_epochs: 3
+max_epochs: 1
