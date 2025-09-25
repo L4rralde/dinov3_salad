@@ -162,3 +162,5 @@ cython_debug/
 urls.py
 gpt_reqs_context/
 logs
+
+weights/

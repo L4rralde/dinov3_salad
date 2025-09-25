@@ -9,7 +9,7 @@ from models.backbones.dinov3 import DINOV3_MEAN_STD
 from autoconfig import load_config
 
 
-torch.set_float32_matmul_precision('medium')
+torch.set_float32_matmul_precision('high')
 
 
 def parse_config():
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     max_epochs = config['max_epochs']
 
     datamodule = GSVCitiesDataModule(
-        batch_size=32,
+        batch_size=60,
         img_per_place=4,
         min_img_per_place=4,
         shuffle_all=False, # shuffle all images or keep shuffling in-city only
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         filename=f'{model.encoder_arch}' + '_({epoch:02d})_R1[{pitts30k_val/R1:.4f}]_R5[{pitts30k_val/R5:.4f}]',
         auto_insert_metric_name=False,
         save_weights_only=True,
-        save_top_k=3,
+        save_top_k=5,
         save_last=True,
         mode='max'
     )

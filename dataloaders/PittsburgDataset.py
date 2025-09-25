@@ -1,3 +1,5 @@
+import os
+
 from os.path import join, exists
 from collections import namedtuple
 from scipy.io import loadmat
@@ -11,11 +13,14 @@ import torch.utils.data as data
 from PIL import Image, UnidentifiedImageError
 from sklearn.neighbors import NearestNeighbors
 
-root_dir = '/media/emmanuel/hdd_storage/pittsburgh/'
+if not 'DINO3_SALAD_ROOT' in os.environ:
+    raise RuntimeError("Please, first set $DINO3_SALAD_ROOT environment variable")
+
+root_dir = os.path.join(os.environ['DINO3_SALAD_ROOT'], 'training_datasets', 'pittsburgh')
 
 if not exists(root_dir):
     raise FileNotFoundError(
-        'root_dir is hardcoded, please adjust to point to Pittsburgh dataset')
+        'root_dir is hardcoded, please adjust to point to Pittsburgh dataset or add softlink to training_datasets')
 
 struct_dir = join(root_dir, 'datasets/')
 queries_dir = join(root_dir, 'queries_real')

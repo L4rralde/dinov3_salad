@@ -1,10 +1,10 @@
 import os
 
-from .git_utils import GIT_ROOT
 
+if not 'DINO3_SALAD_ROOT' in os.environ:
+    raise RuntimeError("Please, first set $DINO3_SALAD_ROOT environment variable")
 
-
-external_dir_path = os.path.join(GIT_ROOT, 'submodules')
+external_dir_path = os.path.join(os.environ['DINO3_SALAD_ROOT'], 'submodules')
 if not os.path.exists(external_dir_path):
     os.makedirs(external_dir_path)
 
